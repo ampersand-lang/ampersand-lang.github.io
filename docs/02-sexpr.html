@@ -1,0 +1,115 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>& Documentation - Syntax</title>
+    <link rel="stylesheet" type="text/css" href="/style/style.css" />
+    <script async type="text/javascript" src="/frontend/style.js"></script>
+    <script defer type="text/javascript" src="/frontend/ampersand.js">()</script>
+</head>
+<body>
+    <header>
+
+    <a id="togglenav" onclick="toggleNav('nav')" href="#">Hide</a>
+    <a href="/">Home</a>
+
+    </header>
+
+    <div id="nav" class="sidenav">
+        <a href="index.html">0: Index</a>
+        <a href="01-syntax.html">1: Syntax</a>
+        <a href="02-sexpr.html">2: Syntax Trees</a>
+    </div>
+
+    <main>
+    <article>
+        <h1>Syntax Trees</h1>
+        <p>
+        &amp; is a homoiconic language, meaning the syntax tree produced by the
+        parser maps 1-to-1 to a data structure available in the language and can
+        later be modified.  Let's review this on the example from earlier.
+        </p>
+
+        <p>
+        This is the example from the earlier chapter.
+        <code class="block">
+mod main;
+use io/print, string/fmt;
+
+let greeting = "Hello, {}!";
+let who = "world";
+print $ fmt greeting, who;
+print $ fmt "{}", 1 + 2;
+
+let zero? n = n == 0;
+def fib n = (fib n - 1) + (fib n - 2);
+        </code>
+        </p>
+
+        <p>
+        Let's make this example a little more verbose by showing the homoiconic
+        AST.
+        <code class="ast">
+(program
+ (mod (ident "main")),
+ (use
+  (ident "io/print"),
+  (ident "string/fmt")),
+
+ (let
+  (=
+   (ident "greeting"),
+   (string "Hello, {}!"))),
+ (let
+  (= (ident "who"), (string "world"))),
+ ($
+  (ident "print")
+  (fmt
+   (ident "greeting"),
+   (ident "who")))),
+ ($
+  (ident "print")
+  (fmt
+   (string "{}"),
+   (+
+    (number 1),
+    (number 2)))),
+
+ (let
+  (=
+   (zero?  (ident "n")),
+   (== (ident "n"), (number 0)))),
+ (def
+  (=
+   (fib (ident "n"))
+   (+
+    (fib (- (ident "n"), (number 1))),
+    (fib (- (ident "n"), (number 2)))))))
+        </code>
+        </p>
+
+        <p>
+        As you can see, there's no special forms in this example program
+        &mdash; everything is a function application (a function call),
+        similarly to a Lisp.  In fact, this "Lisp-like" program is also a valid
+        &amp; program!
+        </p>
+        <p>
+        Every function can also be used as a binary operator.  If three or more
+        words are encountered in sequence, the middle word is assumed to
+        evaluate to a function; or else, the first word in an expression is a
+        function, the second is a the first argument and after that follow more
+        arguments, separated by commas.  In short, binary operator expressions
+        bind tighter than prefix applications; the specific binding order for
+        binary operators can be defined by the user.
+        </p>
+    </article>
+
+    <footer>
+        <a href="https://github.com/ampersand-lang">See my source on Github!</a>
+        <a href="twitch.tv/walterpi">Twitch</a>
+        <a href="twitter.com/the_walterpi">@the_walterpi</a>
+    </footer>
+    </main>
+</body>
+</html>

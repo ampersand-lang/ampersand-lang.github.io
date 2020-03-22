@@ -1,0 +1,114 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>& Documentation - Syntax</title>
+    <link rel="stylesheet" type="text/css" href="/style/style.css" />
+    <script async type="text/javascript" src="/frontend/style.js"></script>
+    <script defer type="text/javascript" src="/frontend/ampersand.js">()</script>
+</head>
+<body>
+    <header>
+
+    <a id="togglenav" onclick="toggleNav('nav')" href="#">Hide</a>
+    <a href="/">Home</a>
+
+    </header>
+
+    <div id="nav" class="sidenav">
+        <a href="index.html">0: Index</a>
+        <a href="01-syntax.html">1: Syntax</a>
+        <a href="02-sexpr.html">2: Syntax Trees</a>
+    </div>
+
+    <main>
+    <article>
+        <h1>Syntax</h1>
+        <p>
+        The syntax of &amp; was designed from the ground up and isn't influenced
+        by the syntax of any language in particular.  Any similarities are a
+        mere conincidence.
+        </p>
+
+        <h2>Spaces</h2>
+        <p>
+        The first important feature of the syntax is that whitespaces are not
+        optional, nevertheless they are insignificant. How does this work?
+        Whitespaces are required to divide words.  However multiple whitespace
+        act the same as a single whitespace. Also, it doesn't matter if you use
+        spaces, tabs, newlines or unicode whitespaces.  They're all equal.  The
+        reasoning behind this is to ensure that good style is always used.
+        There is only a handful of special symbols that don't require
+        whitespaces to be separated from identifiers or operators &mdash; because
+        identifiers and operators are one and the same.  This is another
+        important feature of the syntax.  
+
+        <h2>Words</h2>
+        <p>
+        There is no syntactival distinction between operators, identifiers and
+        keywords.  Keywords are simply builtin functions, macros or intrinsics
+        (more on macros and intrinsics in a later chapter).  Operators are
+        simply binary or unary functions (or macros or intrinsics).
+        </p>
+
+        <p>
+        Collectively these are known as words.
+        </p>
+
+        <h2>Program structure</h2>
+        <p>
+        An &amp; program consists of statements.
+        <code class="inline">def program = any* statement;</code>
+        A statement is semicolon-terminated expression.
+        <code class="inline">
+            def statement = expression and ";";
+        </code>
+        An expression is a word followed by a sequence of words.
+        <code class="inline">def expression = word and word-sequence;</code>
+        Words include: number literals, string literals, character literals,
+        identifiers (paths), index literals, blocks, enclosed expressions and
+        pairs.
+        <code class="inline">
+            def word = or number, string, character, identifier, index, block, enclosed, pair;
+        </code>
+        Every identifier is a path.  A path consists of atoms.  Atoms are not
+        elements of the grammar, they are only conceptual units.  Blocks are
+        lists of statements with an optional expression at the end.
+        <code class="inline">
+            def block = and "{", any* statement, opt expression, "}";
+        </code>
+        Enclosed statements are tuples or arrays, with tuples being
+        parentheses-enclosed and arrays being bracket-enclosed.
+        <code class="block">
+def enclosed = tuple or array;
+def tuple = and "(", any* statement, opt expression, ")";
+def tuple = and "[", any* statement, opt expression, "]";
+        </code>
+        </p>
+
+        <p>
+        And here's a more complete example of &amp; syntax.  The syntax tree for
+        this program will be reviewed in the next chapter.
+        <code class="block">
+mod main;
+use io/print, string/fmt;
+
+let greeting = "Hello, {}!";
+let who = "world";
+print $ fmt greeting, who;
+print $ fmt "{}", 1 + 2;
+
+let zero? n = n == 0;
+def fib n = (fib n - 1) + (fib n - 2);
+        </code>
+        </p>
+    </article>
+
+    <footer>
+        <a href="https://github.com/ampersand-lang">See my source on Github!</a>
+        <a href="twitch.tv/walterpi">Twitch</a>
+        <a href="twitter.com/the_walterpi">@the_walterpi</a>
+    </footer>
+    </main>
+</body>
+</html>
