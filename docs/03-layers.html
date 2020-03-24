@@ -1,0 +1,142 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>& Documentation - Layers</title>
+    <link rel="stylesheet" type="text/css" href="/style/style.css" />
+    <script async type="text/javascript" src="/frontend/style.js"></script>
+    <script defer type="text/javascript" src="/frontend/ampersand.js">()</script>
+</head>
+<body>
+    <header>
+
+    <a id="togglenav" onclick="toggleNav('nav')" href="#">Hide</a>
+    <a href="/">Home</a>
+
+    </header>
+
+    <div id="nav" class="sidenav">
+        <a href="index.html">0: Index</a>
+        <a href="01-syntax.html">1: Syntax</a>
+        <a href="02-sexpr.html">2: Syntax Trees</a>
+        <a href="03-layers.html">3: Layers</a>
+    </div>
+
+    <main>
+    <article>
+        <h1>Layers</h1>
+        <p>
+        &amp; is like an ogre, meaning it comes in layers.  Layers dictate
+        the evaluation of an &amp; program.  The layers are:
+        <ol>
+            <li><code class="inline">mod</code> declarations</li>
+            <li><code class="inline">use</code> declarations</li>
+            <li><code class="inline">def</code> declarations</li>
+            <li>Macro expansion, code generation and intrinsics</li>
+        </ol>
+        </p>
+
+        <p>
+        Let's take a look at our favourite example, extend it a bit and divide
+        it into layers.  This examples features intrinsics and macros.  Macros
+        are basically what you know from other languages: they take some code
+        as their argument and return more code.  Intrinsics are different.
+        They also take some code as their argument, but instead of returning
+        high level code like macros, they build some lower level bytecode,
+        which later gets compiled into machine code.
+        <code class="block">
+mod main;
+use io/print, string/fmt;
+
+let greeting = "Hello, {}!";
+let who = "world";
+print $ fmt greeting, who;
+print $ fmt "{}", 1 + 2;
+
+let zero? n = n == 0;
+def fib n = (fib n - 1) add (fib n - 2);
+if (zero? $ fib 80),
+    print "overflow",
+    print "no overflow!";
+
+def-intr add a, b = {
+ let arg0 = (mk-temp BASIC-BLOCK, "arg");
+ let arg1 = (mk-temp BASIC-BLOCK, "arg");
+ compile-expr CTX, CODE-BUILDER, BASIC-BLOCK, arg0, a;
+ compile-expr CTX, CODE-BUILDER, BASIC-BLOCK, arg1, b;
+ emit CTX, CODE-BUILDER, BASIC-BLOCK, :integer-add, arg0, arg1;
+}
+
+def-macro if p, t, f = {
+ `(cond ~p, ~t, :else ~f)
+}
+        </code>
+        Let's divide it into layers!
+        </p>
+
+        <p>
+        <h3>Layer 1</h3>
+        This layer just sets the module name for future layers.
+        <code class="block">
+mod main;
+        </code>
+        </p>
+
+        <p>
+        <h3>Layer 2</h3>
+        This layer just imports other modules for you to use in
+        <code class="inline">mod main</code>.
+        <code class="block">
+use io/print, string/fmt;
+        </code>
+        </p>
+
+        <p>
+        <h3>Layer 3</h3>
+        This layer reads and compiles all of the <code class="inline">def</code>
+        declarations in order to make them available for your actual code.
+        <code class="block">
+def fib n = (fib n - 1) add (fib n - 2);
+
+def-intr add a, b = {
+ let arg0 = (mk-temp BASIC-BLOCK, "arg");
+ let arg1 = (mk-temp BASIC-BLOCK, "arg");
+ compile-expr CTX, CODE-BUILDER, BASIC-BLOCK, arg0, a;
+ compile-expr CTX, CODE-BUILDER, BASIC-BLOCK, arg1, b;
+ emit CTX, CODE-BUILDER, BASIC-BLOCK, :integer-add, arg0, arg1;
+}
+
+def-macro if p, t, f = {
+ `(cond ~p, ~t, :else ~f)
+}
+        </code>
+        </p>
+
+        <p>
+        <h3>Layer 4</h3>
+        This final layer reads the entire source code in order, recursively
+        expanding macros at the same time and producing the intermediate form
+        (bytecode) through builtin forms as well as intrinsics.
+        <code class="block">
+let greeting = "Hello, {}!";
+let who = "world";
+print $ fmt greeting, who;
+print $ fmt "{}", 1 + 2;
+
+let zero? n = n == 0;
+if (zero? $ fib 80),
+    print "overflow",
+    print "no overflow!";
+        </code>
+        </p>
+
+    </article>
+
+    <footer>
+        <a href="https://github.com/ampersand-lang">See my source on Github!</a>
+        <a href="https://twitch.tv/walterpi">Twitch</a>
+        <a href="https://twitter.com/the_walterpi">@the_walterpi</a>
+    </footer>
+    </main>
+</body>
+</html>

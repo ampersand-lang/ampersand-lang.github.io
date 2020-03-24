@@ -1,5 +1,5 @@
 let colors = [
-    {pattern: /^(let|def|mod|use)$/, css: 'amp-keyword'}, // keywords, like let
+    {pattern: /^(let|def(-intr|-macro)?|mod|use)$/, css: 'amp-keyword'}, // keywords, like let
     {pattern: /^".*"$/, css: 'amp-string'}, // operators, like =
     {pattern: /^(=|:|and|or|any\*|opt|\$|\+|-|==)$/, css: 'amp-operator'}, // operators, like =
     {pattern: /.*/, css: 'amp-generic'}, // everything else
